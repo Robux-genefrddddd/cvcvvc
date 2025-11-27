@@ -829,11 +829,6 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                   overflow: "hidden",
                   maxHeight: "calc(15.5px * 1.45 * 5)",
                 }}
-                placeholder={
-                  conversationId
-                    ? "Votre message..."
-                    : "Sélectionnez une conversation..."
-                }
               />
 
               {/* Send Button */}
