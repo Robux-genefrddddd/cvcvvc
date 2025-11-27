@@ -139,7 +139,7 @@ export default function Index() {
           </div>
 
           <div className="flex-1 text-center">
-            <h1 className="text-lg font-semibold text-white hidden md:block bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold text-white">
               VanIA Chat
             </h1>
           </div>
