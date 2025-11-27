@@ -423,19 +423,19 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
             <PopoverTrigger asChild>
               <button
                 id="emoji-btn"
-                className="p-2 text-white/50 hover:text-white/80 transition-all duration-200 hover:bg-white/10 rounded-lg"
+                className="p-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 hover:bg-secondary rounded-lg"
                 aria-label="Ajouter un emoji"
               >
-                <Smile size={20} />
+                <Smile size={18} />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-64 p-3 bg-card border border-white/20 rounded-2xl shadow-xl">
+            <PopoverContent className="w-64 p-3 bg-card border border-border rounded-lg shadow-md">
               <div className="grid grid-cols-5 gap-2">
                 {EMOJIS.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => addEmoji(emoji)}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-all duration-200 text-xl hover:scale-125 transform"
+                    className="p-2 hover:bg-secondary rounded-lg transition-all duration-200 text-lg hover:scale-110 transform"
                   >
                     {emoji}
                   </button>
