@@ -408,7 +408,6 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
 
   const addEmoji = (emoji: string) => {
     setMessage(message + emoji);
-    setEmojiOpen(false);
   };
 
   const isImageRequest = (text: string): boolean => {
