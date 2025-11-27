@@ -23,9 +23,9 @@ interface SettingsModalProps {
 
 export function SettingsModal({ isOpen, onOpenChange }: SettingsModalProps) {
   const { user, userData } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
-  const [darkMode, setDarkMode] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -44,27 +44,10 @@ export function SettingsModal({ isOpen, onOpenChange }: SettingsModalProps) {
 
   const handleDarkModeToggle = async () => {
     try {
-      const newDarkMode = !darkMode;
-      setDarkMode(newDarkMode);
-
-      if (user?.uid) {
-        const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, {
-          darkMode: newDarkMode,
-        });
-
-        if (newDarkMode) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      }
-
-      localStorage.setItem("darkMode", JSON.stringify(newDarkMode));
-      toast.success(newDarkMode ? "Mode sombre activé" : "Mode clair activé");
+      toggleTheme();
+      toast.success(!isDark ? "Mode sombre activé" : "Mode clair activé");
     } catch (error) {
       console.error("Error toggling dark mode:", error);
-      setDarkMode(!darkMode);
       toast.error("Erreur lors du changement de mode");
     }
   };
