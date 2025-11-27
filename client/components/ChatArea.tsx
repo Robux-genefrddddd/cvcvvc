@@ -21,7 +21,7 @@ const EMOJIS = [
   "🤔",
   "😢",
   "😡",
-  "���",
+  "🎉",
   "🔥",
   "👍",
   "❤️",
@@ -112,6 +112,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
     const userMessageText = message;
     setMessage("");
     setLoading(true);
+    setIsThinking(true);
 
     try {
       // Add user message to chat
@@ -136,6 +137,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
         content: msg.content,
       }));
 
+      setIsThinking(false);
       const aiResponse = await AIService.sendMessage(
         userMessageText,
         conversationHistory,
@@ -169,6 +171,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
       );
     } finally {
       setLoading(false);
+      setIsThinking(false);
     }
   };
 
