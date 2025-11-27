@@ -142,6 +142,15 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
     }
   }, [conversationId, user?.uid]);
 
+  // Cleanup typing interval on unmount
+  useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages, loading, isThinking, typingText]);
