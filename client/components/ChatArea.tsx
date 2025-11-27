@@ -236,7 +236,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            {chatMessages.map((msg, index) => (
+            {chatMessages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${
@@ -250,28 +250,11 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                       : "bg-white/10 text-foreground/90 rounded-bl-none"
                   }`}
                 >
-                  {msg.role === "assistant" && index === chatMessages.length - 1 && loading ? (
-                    <TypewriterText
-                      text={msg.content}
-                      speed={20}
-                      onComplete={() => setLoading(false)}
-                    >
-                      {(displayedText) => (
-                        <MessageRenderer content={displayedText} role={msg.role} isStreaming={loading} />
-                      )}
-                    </TypewriterText>
-                  ) : (
-                    <MessageRenderer content={msg.content} role={msg.role} />
-                  )}
+                  <MessageRenderer content={msg.content} role={msg.role} />
                 </div>
               </div>
             ))}
-            {isThinking && (
-              <div className="flex justify-start animate-slideUp">
-                <ThinkingAnimation />
-              </div>
-            )}
-            {loading && !isThinking && (
+            {(loading || isThinking) && (
               <div className="flex justify-start animate-slideUp">
                 <ThinkingAnimation />
               </div>
