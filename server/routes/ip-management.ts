@@ -72,9 +72,7 @@ export const handleCheckIPLimit: RequestHandler = async (req, res) => {
     const { ipAddress, maxAccounts } = req.body;
 
     if (!ipAddress || !maxAccounts) {
-      res
-        .status(400)
-        .json({ error: "IP address and maxAccounts required" });
+      res.status(400).json({ error: "IP address and maxAccounts required" });
       return;
     }
 

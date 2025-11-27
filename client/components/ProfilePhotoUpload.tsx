@@ -20,7 +20,9 @@ export function ProfilePhotoUpload({
 }: ProfilePhotoUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(currentPhotoUrl || null);
+  const [preview, setPreview] = useState<string | null>(
+    currentPhotoUrl || null,
+  );
   const [uploading, setUploading] = useState(false);
 
   const handleFileSelect = async (
@@ -187,9 +189,7 @@ export function ProfilePhotoUpload({
             className="hidden"
             aria-label="Sélectionner une photo de profil"
           />
-          <p className="text-xs text-white/50 mt-2">
-            Max 5MB • JPG, PNG, WebP
-          </p>
+          <p className="text-xs text-white/50 mt-2">Max 5MB • JPG, PNG, WebP</p>
         </div>
       </div>
     </div>

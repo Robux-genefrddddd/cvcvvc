@@ -50,8 +50,12 @@ export function SettingsModal({ isOpen, onOpenChange }: SettingsModalProps) {
             <>
               <ProfilePhotoUpload
                 userId={user.uid}
-                currentPhotoUrl={userData?.profilePhotoURL || user.photoURL || undefined}
-                displayName={userData?.displayName || user.displayName || "User"}
+                currentPhotoUrl={
+                  userData?.profilePhotoURL || user.photoURL || undefined
+                }
+                displayName={
+                  userData?.displayName || user.displayName || "User"
+                }
               />
               <div className="h-px bg-white/10"></div>
             </>

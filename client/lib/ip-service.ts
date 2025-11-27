@@ -102,7 +102,8 @@ export class IPService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.error || `Failed to update user IP login: ${response.status}`,
+          errorData.error ||
+            `Failed to update user IP login: ${response.status}`,
         );
       }
     } catch (error) {

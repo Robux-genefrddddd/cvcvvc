@@ -92,16 +92,18 @@ export function DisclaimerModal({
               <h3 className="font-semibold text-white mb-2">
                 📋 Prohibited Uses
               </h3>
-              <p>
-                You agree not to use Vanilla AI for:
-              </p>
+              <p>You agree not to use Vanilla AI for:</p>
               <ul className="list-disc list-inside space-y-1 ml-2 mt-2">
                 <li>Creating harmful, illegal, or malicious content</li>
                 <li>Impersonation or fraud</li>
                 <li>Harassment or abuse</li>
                 <li>Violating privacy or security</li>
-                <li>Generating content for human trafficking or exploitation</li>
-                <li>Any activity that violates local, state, or international law</li>
+                <li>
+                  Generating content for human trafficking or exploitation
+                </li>
+                <li>
+                  Any activity that violates local, state, or international law
+                </li>
               </ul>
             </div>
 
