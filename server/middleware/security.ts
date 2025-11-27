@@ -160,6 +160,7 @@ export function serverRateLimit(
 
 /**
  * Authentication middleware - extracts and validates JWT token from request.
+ * Decodes JWT claims without verifying signature (signature verified later by routes).
  */
 export function authMiddleware(
   req: Request,
@@ -173,14 +174,32 @@ export function authMiddleware(
       : null);
 
   if (!idToken) {
-    // Store null userId and continue (route handlers will check for auth)
+    // Store null and continue (route handlers will check for auth)
     (req as any).idToken = null;
-    (req as any).userId = null;
+    (req as any).decodedUid = null;
     return next();
   }
 
   // Store token on request for later verification
   (req as any).idToken = idToken;
+
+  // Try to extract UID from JWT for rate limiting purposes
+  // This is not a security verification - the actual route will verify the signature
+  try {
+    // Firebase JWT format: header.payload.signature
+    const parts = idToken.split(".");
+    if (parts.length === 3) {
+      const payload = JSON.parse(
+        Buffer.from(parts[1], "base64").toString("utf-8"),
+      );
+      if (payload.uid) {
+        (req as any).decodedUid = payload.uid;
+      }
+    }
+  } catch (error) {
+    // If parsing fails, just continue - signature verification will catch invalid tokens
+  }
+
   next();
 }
 
