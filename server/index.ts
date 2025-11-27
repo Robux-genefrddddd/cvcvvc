@@ -29,7 +29,9 @@ export function createServer() {
 
   // Middleware - Order matters!
   // 1. CORS first (allow trusted origins)
-  const corsOrigins = (process.env.CORS_ORIGINS || "").split(",").filter(Boolean);
+  const corsOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .filter(Boolean);
   app.use(
     cors({
       origin: corsOrigins.length > 0 ? corsOrigins : true,
@@ -46,7 +48,10 @@ export function createServer() {
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
     res.setHeader("X-Content-Security-Policy", "default-src 'self'");
-    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains",
+    );
     next();
   });
 

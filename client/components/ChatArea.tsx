@@ -106,7 +106,9 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
 
     // Rate limiting check
     if (!messageRateLimiter.current.isAllowed()) {
-      toast.error("Trop de messages. Veuillez attendre avant d'envoyer un nouveau message.");
+      toast.error(
+        "Trop de messages. Veuillez attendre avant d'envoyer un nouveau message.",
+      );
       return;
     }
 

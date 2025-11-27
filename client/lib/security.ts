@@ -144,14 +144,20 @@ export class RateLimiter {
       const now = Date.now();
 
       if (!data) {
-        localStorage.setItem(this.key, JSON.stringify({ count: 1, resetAt: now + this.windowMs }));
+        localStorage.setItem(
+          this.key,
+          JSON.stringify({ count: 1, resetAt: now + this.windowMs }),
+        );
         return true;
       }
 
       const parsed = JSON.parse(data);
 
       if (now > parsed.resetAt) {
-        localStorage.setItem(this.key, JSON.stringify({ count: 1, resetAt: now + this.windowMs }));
+        localStorage.setItem(
+          this.key,
+          JSON.stringify({ count: 1, resetAt: now + this.windowMs }),
+        );
         return true;
       }
 
@@ -292,7 +298,9 @@ export function createSecureConversation(
 export function generateCSRFToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
+    "",
+  );
 }
 
 /**

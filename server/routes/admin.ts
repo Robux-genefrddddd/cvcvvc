@@ -63,8 +63,7 @@ export const handleVerifyAdmin: RequestHandler = async (req, res) => {
     const status = error instanceof z.ZodError ? 400 : 401;
     res.status(status).json({
       error: "Unauthorized",
-      message:
-        error instanceof Error ? error.message : "Verification failed",
+      message: error instanceof Error ? error.message : "Verification failed",
     });
   }
 };
@@ -73,9 +72,7 @@ export const handleVerifyAdmin: RequestHandler = async (req, res) => {
 export const handleBanUser: RequestHandler = async (req, res) => {
   try {
     const validated = BanUserSchema.parse(req.body);
-    const adminUid = await FirebaseAdminService.verifyAdmin(
-      validated.idToken,
-    );
+    const adminUid = await FirebaseAdminService.verifyAdmin(validated.idToken);
 
     const banId = await FirebaseAdminService.banUser(
       adminUid,
@@ -129,9 +126,7 @@ export const handleGetAllUsers: RequestHandler = async (req, res) => {
 export const handleCreateLicense: RequestHandler = async (req, res) => {
   try {
     const validated = CreateLicenseSchema.parse(req.body);
-    const adminUid = await FirebaseAdminService.verifyAdmin(
-      validated.idToken,
-    );
+    const adminUid = await FirebaseAdminService.verifyAdmin(validated.idToken);
 
     const licenseKey = await FirebaseAdminService.createLicense(
       adminUid,
@@ -154,9 +149,7 @@ export const handleCreateLicense: RequestHandler = async (req, res) => {
 export const handleBanIP: RequestHandler = async (req, res) => {
   try {
     const validated = BanIPSchema.parse(req.body);
-    const adminUid = await FirebaseAdminService.verifyAdmin(
-      validated.idToken,
-    );
+    const adminUid = await FirebaseAdminService.verifyAdmin(validated.idToken);
 
     const banId = await FirebaseAdminService.banIP(
       adminUid,
@@ -190,9 +183,7 @@ export const handleDeleteUser: RequestHandler = async (req, res) => {
       })
       .parse(req.body);
 
-    const adminUid = await FirebaseAdminService.verifyAdmin(
-      validated.idToken,
-    );
+    const adminUid = await FirebaseAdminService.verifyAdmin(validated.idToken);
 
     await FirebaseAdminService.deleteUser(adminUid, validated.userId);
 

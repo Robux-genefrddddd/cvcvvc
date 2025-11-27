@@ -16,6 +16,7 @@ This application is configured with multiple layers of security to prevent unaut
    - Download the JSON file
 
 2. **Set Environment Variable Securely**
+
    ```bash
    # On deployment platform (not in .env file):
    FIREBASE_SERVICE_ACCOUNT_KEY="<entire JSON content as string>"
@@ -112,6 +113,7 @@ The `isAdmin` field:
 ### Backend Admin Verification
 
 Every admin endpoint:
+
 1. Validates the ID token with Firebase
 2. Decodes the token to get user UID
 3. Checks the `isAdmin` field in Firestore
@@ -121,14 +123,14 @@ Every admin endpoint:
 static async verifyAdmin(idToken: string): Promise<string> {
   const auth = getAdminAuth();
   const decodedToken = await auth.verifyIdToken(idToken);
-  
+
   const db = getAdminDb();
   const userDoc = await db.collection("users").doc(decodedToken.uid).get();
-  
+
   if (!userDoc.exists || !userDoc.data()?.isAdmin) {
     throw new Error("Unauthorized: Not an admin");
   }
-  
+
   return decodedToken.uid;
 }
 ```
@@ -146,7 +148,7 @@ To create the first admin:
    ```typescript
    const db = getAdminDb();
    await db.collection("users").doc(userId).update({
-     isAdmin: true
+     isAdmin: true,
    });
    ```
 
@@ -167,6 +169,7 @@ PING_MESSAGE="pong"
 ### Safe Variables
 
 These are safe to expose (not sensitive):
+
 - React app config (vite.config.ts)
 - Firebase public config (API key, project ID)
 
@@ -210,6 +213,7 @@ Review these logs regularly for suspicious activity.
 **Cause**: Firestore rules are too restrictive for legitimate operations.
 
 **Solution**:
+
 1. Check the specific operation in the rules
 2. Verify user is authenticated
 3. Verify operation matches the rules
@@ -220,12 +224,14 @@ Review these logs regularly for suspicious activity.
 **Cause**: Read rules are too permissive.
 
 **Solution**:
+
 - Review `firestore.rules` - ensure users can only read their own data
 - Use backend API for aggregated data (like admin user list)
 
 ### Issue: Admin password visible in code
 
 **Solution**:
+
 - There is no admin password
 - Admin status is set in Firestore `isAdmin: true`
 - Can only be set via backend or Firebase Console
@@ -234,6 +240,7 @@ Review these logs regularly for suspicious activity.
 ### Issue: Injection attacks in admin panel
 
 **Solution**:
+
 - All input validated with Zod before database operations
 - All strings trimmed and length-limited
 - No direct string concatenation in queries

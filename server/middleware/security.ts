@@ -50,11 +50,7 @@ export function validateRequestSize(
  * Input validation middleware.
  * Checks request body for suspicious patterns and injection attempts.
  */
-export function validateInput(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export function validateInput(req: Request, res: Response, next: NextFunction) {
   if (!req.body || typeof req.body !== "object") {
     return next();
   }
@@ -82,7 +78,9 @@ export function validateInput(
       return true;
     }
     if (typeof obj === "object" && obj !== null) {
-      return Object.values(obj).some((val) => checkStringLength(val, maxLength));
+      return Object.values(obj).some((val) =>
+        checkStringLength(val, maxLength),
+      );
     }
     return false;
   };
@@ -127,15 +125,9 @@ export function validateInput(
  * Rate limiting helper using in-memory store.
  * For production, use Redis or similar.
  */
-const rateLimitStore = new Map<
-  string,
-  { count: number; resetTime: number }
->();
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-export function rateLimit(
-  windowMs: number = 60000,
-  maxRequests: number = 100,
-) {
+export function rateLimit(windowMs: number = 60000, maxRequests: number = 100) {
   return (req: Request, res: Response, next: NextFunction) => {
     const ip =
       (req.headers["x-forwarded-for"] as string) ||
@@ -291,7 +283,10 @@ export const CreateLicenseSchema = AdminOperationSchema.extend({
 });
 
 export const BanIPSchema = AdminOperationSchema.extend({
-  ipAddress: z.string().ip({ version: "v4" }).or(z.string().ip({ version: "v6" })),
+  ipAddress: z
+    .string()
+    .ip({ version: "v4" })
+    .or(z.string().ip({ version: "v6" })),
   reason: z.string().min(5).max(500).trim(),
   duration: z.number().int().min(1).max(36500),
 });

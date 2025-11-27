@@ -14,6 +14,7 @@ Your application now has **production-grade security** with:
 ## Files Created/Modified
 
 ### Security Files (New)
+
 - **firestore.rules** - Production firestore security rules
 - **server/lib/firebase-admin.ts** - Secure Firebase admin wrapper
 - **server/routes/admin.ts** - Protected admin API endpoints
@@ -21,6 +22,7 @@ Your application now has **production-grade security** with:
 - **SECURITY_SETUP.md** - This file
 
 ### Server Updates
+
 - **server/index.ts** - Added admin routes, security headers, error handling
 
 ## Immediate Setup Required
@@ -43,6 +45,7 @@ FIREBASE_SERVICE_ACCOUNT_KEY
 Value: Copy-paste your Firebase service account JSON as a string (don't add extra quotes)
 
 **To get the service account:**
+
 1. Firebase Console → Project Settings → Service Accounts
 2. Click "Generate new private key"
 3. Download the JSON file
@@ -51,6 +54,7 @@ Value: Copy-paste your Firebase service account JSON as a string (don't add extr
 ### Step 3: Create First Admin User
 
 **Option A: Firebase Console (Recommended)**
+
 1. Create a new user via Authentication
 2. Get their UID
 3. Go to Firestore → users collection
@@ -58,6 +62,7 @@ Value: Copy-paste your Firebase service account JSON as a string (don't add extr
 5. Add field: `isAdmin: true` (boolean)
 
 **Option B: Via Backend (if you have admin access)**
+
 - Contact your backend provider to set the isAdmin field
 
 ### Step 4: Test It Works
@@ -71,6 +76,7 @@ Value: Copy-paste your Firebase service account JSON as a string (don't add extr
 ## What Changed for Users
 
 ### Regular Users
+
 - Can still chat normally ✓
 - Can create conversations ✓
 - Can send/receive messages ✓
@@ -78,6 +84,7 @@ Value: Copy-paste your Firebase service account JSON as a string (don't add extr
 - Cannot see admin password or credentials ✓
 
 ### Admin Users
+
 - Can access admin panel ✓
 - Can ban users (backend API call) ✓
 - Can create licenses (backend API call) ✓
@@ -87,6 +94,7 @@ Value: Copy-paste your Firebase service account JSON as a string (don't add extr
 ## How It Works Now
 
 ### Before (Unsafe)
+
 ```
 User → Client (Firebase Config) → Firestore (Direct)
        ❌ Firebase config visible
@@ -95,6 +103,7 @@ User → Client (Firebase Config) → Firestore (Direct)
 ```
 
 ### After (Secure)
+
 ```
 User → Client (No Firebase) → Backend API → Firebase Admin SDK → Firestore
                              ✓ Validated input
@@ -107,6 +116,7 @@ User → Client (No Firebase) → Backend API → Firebase Admin SDK → Firesto
 All require `idToken` (Firebase auth token) in request body.
 
 ### Verify Admin
+
 ```bash
 POST /api/admin/verify
 Body: { "idToken": "..." }
@@ -114,6 +124,7 @@ Response: { "success": true, "adminUid": "..." }
 ```
 
 ### Get All Users
+
 ```bash
 GET /api/admin/users
 Header: Authorization: Bearer {idToken}
@@ -121,6 +132,7 @@ Response: { "success": true, "users": [...] }
 ```
 
 ### Ban User
+
 ```bash
 POST /api/admin/ban-user
 Body: {
@@ -133,6 +145,7 @@ Response: { "success": true, "banId": "..." }
 ```
 
 ### Create License
+
 ```bash
 POST /api/admin/create-license
 Body: {
@@ -144,6 +157,7 @@ Response: { "success": true, "licenseKey": "LIC-..." }
 ```
 
 ### Ban IP
+
 ```bash
 POST /api/admin/ban-ip
 Body: {
@@ -158,24 +172,28 @@ Response: { "success": true, "banId": "..." }
 ## Security Features
 
 ### Cannot Escalate Privileges
+
 ❌ Users cannot modify `isAdmin` field
 ❌ Firestore rules block any update with `isAdmin`
 ❌ Backend checks admin status on every operation
 ❌ No way to gain admin access without Firebase Console
 
 ### Cannot Inject Code
+
 ❌ All input validated with Zod
 ❌ No direct string concatenation
 ❌ All strings length-limited (max 500)
 ❌ No SQL/NoSQL injection possible (using Firestore SDK)
 
 ### Cannot See Other Users' Data
+
 ❌ Users can only read their own documents
 ❌ Conversations are private to owner
 ❌ Messages are only visible to conversation owner
 ❌ Admin user list only available via backend API
 
 ### Cannot See Admin Credentials
+
 ❌ Firebase config in client only contains public API key
 ❌ Service account never exposed
 ❌ Admin tokens are only in Firebase Auth (encrypted)
@@ -198,6 +216,7 @@ Review these logs regularly in your deployment platform.
 ### "Missing or insufficient permissions" when sending messages
 
 If you still get this error:
+
 1. Check Firestore rules are published ✓
 2. Check user is logged in ✓
 3. Check conversation exists with correct userId ✓
@@ -241,12 +260,14 @@ If you still get this error:
 ## Support
 
 If you encounter issues:
+
 1. Check logs in your deployment platform
 2. Review SECURITY.md for detailed explanations
 3. Verify environment variables are set correctly
 4. Test with curl commands above to isolate the issue
 
 Your application is now hardened against:
+
 - ✓ SQL/NoSQL injection
 - ✓ Privilege escalation
 - ✓ XSS attacks
