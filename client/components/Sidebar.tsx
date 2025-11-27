@@ -367,8 +367,14 @@ export function Sidebar({
         {/* Message Usage Section */}
         <div
           id="messages-counter"
-          className="px-3 py-3 border-t border-white/[0.08] animate-fadeIn mx-3 bg-white/[0.02] rounded-lg"
-          style={{ animationDelay: "0.25s" }}
+          className="px-3 py-2.5 border-t border-white/[0.08] animate-fadeIn bg-white/[0.02] rounded-[10px] shadow-sm"
+          style={{
+            animationDelay: "0.25s",
+            marginLeft: "20px",
+            marginTop: "16px",
+            marginBottom: "22px",
+            maxWidth: "calc(100% - 40px)"
+          }}
         >
           <div className="flex items-center gap-2 mb-2.5 justify-between">
             <span className="text-xs text-foreground/70 font-medium">Messages</span>
