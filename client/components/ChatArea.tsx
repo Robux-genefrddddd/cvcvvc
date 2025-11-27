@@ -638,7 +638,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                                       backgroundColor: isDark
                                         ? "#111418"
                                         : "#E5E7EB",
-                                      color: isDark ? "#E5E7EB" : "#1E1E1E",
+                                      color: isDark ? "#E5E7EB" : "#1A1A1A",
                                       height: "auto",
                                       lineHeight: "1.3",
                                       border: isDark
@@ -662,7 +662,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                               className="rounded-lg rounded-tl-none py-2 px-3 text-sm break-words transition-all duration-300"
                               style={{
                                 backgroundColor: isDark ? "#111418" : "#E5E7EB",
-                                color: isDark ? "#E5E7EB" : "#1E1E1E",
+                                color: isDark ? "#E5E7EB" : "#1A1A1A",
                                 height: "auto",
                                 lineHeight: "1.3",
                                 border: isDark
