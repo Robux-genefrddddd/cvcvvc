@@ -410,8 +410,10 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
   return (
     <div
       id="chat-area"
-      className="flex-1 flex flex-col min-h-0"
-      style={{ backgroundColor: "#0e0e0e" }}
+      className="flex-1 flex flex-col min-h-0 transition-colors duration-300"
+      style={{
+        backgroundColor: isDark ? "#0e0e0e" : "#F3F4F6"
+      }}
     >
       {/* Main Content Area - Messages Container */}
       <div className="flex-1 overflow-y-auto flex flex-col px-6 md:px-8 py-6 animate-fadeIn min-h-0 items-center">
