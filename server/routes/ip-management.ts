@@ -209,26 +209,21 @@ export const handleRecordUserIP: RequestHandler = async (req, res) => {
 
 export const handleUpdateUserIPLogin: RequestHandler = async (req, res) => {
   try {
-    const { userId, ipAddress } = req.body;
-
-    if (!userId || !ipAddress) {
-      res.status(400).json({ error: "userId and ipAddress required" });
-      return;
-    }
+    // Validate input
+    const validated = UpdateUserIPLoginSchema.parse(req.body);
+    const { userId, ipAddress } = validated;
 
     // If Firebase Admin is not initialized, skip updating
     if (!isAdminInitialized()) {
       console.warn(
         "Firebase Admin not initialized. Skipping IP login update. Set FIREBASE_SERVICE_ACCOUNT_KEY env var.",
       );
-      res.json({ success: true });
-      return;
+      return res.json({ success: true });
     }
 
     const db = getAdminDb();
     if (!db) {
-      res.json({ success: true });
-      return;
+      return res.json({ success: true });
     }
 
     const snapshot = await db
@@ -258,9 +253,15 @@ export const handleUpdateUserIPLogin: RequestHandler = async (req, res) => {
       });
     }
 
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Invalid request parameters",
+        details: error.errors,
+      });
+    }
     console.error("Error updating user IP login:", error);
-    res.status(500).json({ error: "Failed to update IP login" });
+    return res.status(500).json({ error: "Failed to update IP login" });
   }
 };
