@@ -31,7 +31,7 @@ const EMOJIS = [
   "🤔",
   "😢",
   "😡",
-  "🎉",
+  "����",
   "🔥",
   "💯",
   "❤️",
@@ -654,7 +654,11 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                     ? "Votre message..."
                     : "Sélectionnez une conversation..."
                 }
-                className="flex-1 bg-transparent text-white placeholder-white/50 focus:outline-none text-sm leading-[1.55] disabled:opacity-50 transition-colors resize-none max-h-48"
+                className={`flex-1 bg-transparent focus:outline-none text-sm leading-[1.55] disabled:opacity-50 transition-colors resize-none max-h-48 ${
+                  isDark
+                    ? "text-white placeholder-white/50"
+                    : "text-[#1A1A1A] placeholder-[#3F3F3F]/50"
+                }`}
                 style={{
                   height: `${AUTO_RESIZE_CONFIG.minHeight}px`,
                   overflow: "hidden",
