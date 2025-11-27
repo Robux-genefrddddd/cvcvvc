@@ -1,7 +1,5 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 
 interface MessageRendererProps {
   content: string;
@@ -57,6 +55,280 @@ function CodeBlockWithCopy({
   );
 }
 
+function parseMarkdownElements(text: string): ReactNode[] {
+  const lines = text.split("\n");
+  const elements: ReactNode[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Code blocks
+    if (trimmed.startsWith("```")) {
+      const lang = trimmed.slice(3).trim();
+      let code = "";
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        code += lines[i] + "\n";
+        i++;
+      }
+      elements.push(
+        <CodeBlockWithCopy
+          key={`code-${i}`}
+          language={lang}
+          code={code.trim()}
+        />
+      );
+      i++;
+      continue;
+    }
+
+    // Headers
+    const headerMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+    if (headerMatch) {
+      const level = headerMatch[1].length;
+      const content = headerMatch[2];
+      const HeadingTag = `h${level}` as const;
+      const headingClasses = {
+        h1: "text-3xl font-bold mb-4 mt-6 border-b border-white/20 pb-2",
+        h2: "text-2xl font-bold mb-3 mt-5 border-b border-white/10 pb-2",
+        h3: "text-xl font-bold mb-2 mt-4",
+        h4: "text-lg font-bold mb-2 mt-3",
+        h5: "text-base font-bold mb-2 mt-2",
+        h6: "text-sm font-bold mb-2 mt-2",
+      };
+
+      const HeadingElement = HeadingTag;
+      elements.push(
+        <HeadingElement
+          key={`h-${i}`}
+          className={`text-white ${headingClasses[HeadingTag]}`}
+        >
+          {parseInlineMarkdown(content)}
+        </HeadingElement>
+      );
+      i++;
+      continue;
+    }
+
+    // Blockquotes
+    if (trimmed.startsWith(">")) {
+      let quoteText = trimmed.slice(1).trim();
+      i++;
+      while (i < lines.length && lines[i].trim().startsWith(">")) {
+        quoteText += " " + lines[i].trim().slice(1).trim();
+        i++;
+      }
+      elements.push(
+        <blockquote
+          key={`quote-${i}`}
+          className="border-l-4 border-orange-500 pl-4 py-2 my-3 text-white/70 italic bg-orange-500/10 rounded-r-lg"
+        >
+          {parseInlineMarkdown(quoteText)}
+        </blockquote>
+      );
+      continue;
+    }
+
+    // Lists
+    if (trimmed.match(/^[\*\-\+]\s+/) || trimmed.match(/^\d+\.\s+/)) {
+      const isOrdered = !!trimmed.match(/^\d+\.\s+/);
+      const listItems: string[] = [];
+
+      while (
+        i < lines.length &&
+        (lines[i].trim().match(/^[\*\-\+]\s+/) ||
+          lines[i].trim().match(/^\d+\.\s+/))
+      ) {
+        listItems.push(
+          lines[i]
+            .trim()
+            .replace(/^[\*\-\+]\s+/, "")
+            .replace(/^\d+\.\s+/, "")
+        );
+        i++;
+      }
+
+      if (isOrdered) {
+        elements.push(
+          <ol
+            key={`ol-${i}`}
+            className="list-decimal list-inside mb-3 space-y-2 text-white/90 pl-2"
+          >
+            {listItems.map((item, idx) => (
+              <li key={idx} className="text-white/90 leading-relaxed">
+                {parseInlineMarkdown(item)}
+              </li>
+            ))}
+          </ol>
+        );
+      } else {
+        elements.push(
+          <ul
+            key={`ul-${i}`}
+            className="list-disc list-inside mb-3 space-y-2 text-white/90 pl-2"
+          >
+            {listItems.map((item, idx) => (
+              <li key={idx} className="text-white/90 leading-relaxed">
+                {parseInlineMarkdown(item)}
+              </li>
+            ))}
+          </ul>
+        );
+      }
+      continue;
+    }
+
+    // Regular paragraphs
+    if (trimmed) {
+      elements.push(
+        <p
+          key={`p-${i}`}
+          className="mb-3 leading-relaxed text-white/90"
+        >
+          {parseInlineMarkdown(trimmed)}
+        </p>
+      );
+    }
+
+    i++;
+  }
+
+  return elements;
+}
+
+function parseInlineMarkdown(text: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let lastIndex = 0;
+
+  // Bold (**text** or __text__)
+  const boldRegex = /\*\*(.+?)\*\*|__(.+?)__/g;
+  let match;
+
+  // Process all inline formatting
+  const allMatches: Array<{
+    type: string;
+    start: number;
+    end: number;
+    content: string;
+  }> = [];
+
+  // Bold
+  const boldRe = /\*\*(.+?)\*\*|__(.+?)__/g;
+  while ((match = boldRe.exec(text))) {
+    allMatches.push({
+      type: "bold",
+      start: match.index,
+      end: match.index + match[0].length,
+      content: match[1] || match[2],
+    });
+  }
+
+  // Italic
+  const italicRe = /\*(.+?)\*|_(.+?)_/g;
+  while ((match = italicRe.exec(text))) {
+    // Skip if it's part of bold
+    const isBold = allMatches.some(
+      (m) =>
+        m.type === "bold" &&
+        m.start <= match.index &&
+        match.index + match[0].length <= m.end
+    );
+    if (!isBold) {
+      allMatches.push({
+        type: "italic",
+        start: match.index,
+        end: match.index + match[0].length,
+        content: match[1] || match[2],
+      });
+    }
+  }
+
+  // Inline code
+  const codeRe = /`(.+?)`/g;
+  while ((match = codeRe.exec(text))) {
+    allMatches.push({
+      type: "code",
+      start: match.index,
+      end: match.index + match[0].length,
+      content: match[1],
+    });
+  }
+
+  // Links
+  const linkRe = /\[(.+?)\]\((.+?)\)/g;
+  while ((match = linkRe.exec(text))) {
+    allMatches.push({
+      type: "link",
+      start: match.index,
+      end: match.index + match[0].length,
+      content: match[1],
+      url: match[2],
+    });
+  }
+
+  // Sort by position
+  allMatches.sort((a, b) => a.start - b.start);
+
+  // Render with formatting
+  allMatches.forEach((m, idx) => {
+    if (m.start > lastIndex) {
+      parts.push(text.substring(lastIndex, m.start));
+    }
+
+    switch (m.type) {
+      case "bold":
+        parts.push(
+          <strong key={idx} className="font-bold text-white">
+            {m.content}
+          </strong>
+        );
+        break;
+      case "italic":
+        parts.push(
+          <em key={idx} className="italic text-white/95">
+            {m.content}
+          </em>
+        );
+        break;
+      case "code":
+        parts.push(
+          <code
+            key={idx}
+            className="bg-white/15 px-2 py-1 rounded font-mono text-sm text-orange-300 border border-white/10 font-semibold"
+          >
+            {m.content}
+          </code>
+        );
+        break;
+      case "link":
+        parts.push(
+          <a
+            key={idx}
+            href={m.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-orange-400 hover:text-orange-300 underline font-medium transition-colors"
+          >
+            {m.content}
+          </a>
+        );
+        break;
+      default:
+        break;
+    }
+
+    lastIndex = m.end;
+  });
+
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
+}
+
 export function MessageRenderer({
   content,
   role,
@@ -80,204 +352,14 @@ export function MessageRenderer({
     );
   }
 
+  const elements = parseMarkdownElements(content);
+
   return (
-    <>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          // Code blocks with copy button
-          code({ inline, className, children }: any) {
-            if (inline) {
-              return (
-                <code className="bg-white/15 px-2 py-1 rounded font-mono text-sm text-orange-300 border border-white/10 font-semibold break-words">
-                  {children}
-                </code>
-              );
-            }
-
-            const match = /language-(\w+)/.exec(className || "");
-            const language = match ? match[1] : "";
-            const code = String(children).replace(/\n$/, "");
-
-            return (
-              <CodeBlockWithCopy language={language} code={code} />
-            );
-          },
-          
-          // Paragraphs
-          p({ children }: any) {
-            return <p className="mb-3 leading-relaxed text-white/90">{children}</p>;
-          },
-
-          // Headers
-          h1({ children }: any) {
-            return (
-              <h1 className="text-3xl font-bold mb-4 mt-6 text-white border-b border-white/20 pb-2">
-                {children}
-              </h1>
-            );
-          },
-          h2({ children }: any) {
-            return (
-              <h2 className="text-2xl font-bold mb-3 mt-5 text-white border-b border-white/10 pb-2">
-                {children}
-              </h2>
-            );
-          },
-          h3({ children }: any) {
-            return (
-              <h3 className="text-xl font-bold mb-2 mt-4 text-white/95">
-                {children}
-              </h3>
-            );
-          },
-          h4({ children }: any) {
-            return (
-              <h4 className="text-lg font-bold mb-2 mt-3 text-white/90">
-                {children}
-              </h4>
-            );
-          },
-          h5({ children }: any) {
-            return (
-              <h5 className="text-base font-bold mb-2 mt-3 text-white/85">
-                {children}
-              </h5>
-            );
-          },
-          h6({ children }: any) {
-            return (
-              <h6 className="text-sm font-bold mb-2 mt-2 text-white/80">
-                {children}
-              </h6>
-            );
-          },
-
-          // Lists
-          ul({ children }: any) {
-            return (
-              <ul className="list-disc list-inside mb-3 space-y-2 text-white/90 pl-2">
-                {children}
-              </ul>
-            );
-          },
-          ol({ children }: any) {
-            return (
-              <ol className="list-decimal list-inside mb-3 space-y-2 text-white/90 pl-2">
-                {children}
-              </ol>
-            );
-          },
-          li({ children }: any) {
-            return (
-              <li className="text-white/90 leading-relaxed">
-                {children}
-              </li>
-            );
-          },
-
-          // Blockquotes
-          blockquote({ children }: any) {
-            return (
-              <blockquote className="border-l-4 border-orange-500 pl-4 py-2 my-3 text-white/70 italic bg-orange-500/10 rounded-r-lg">
-                {children}
-              </blockquote>
-            );
-          },
-
-          // Links
-          a({ href, children }: any) {
-            return (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-orange-400 hover:text-orange-300 underline font-medium transition-colors"
-              >
-                {children}
-              </a>
-            );
-          },
-
-          // Text formatting
-          strong({ children }: any) {
-            return (
-              <strong className="font-bold text-white">
-                {children}
-              </strong>
-            );
-          },
-          em({ children }: any) {
-            return (
-              <em className="italic text-white/95">
-                {children}
-              </em>
-            );
-          },
-          del({ children }: any) {
-            return (
-              <del className="line-through text-white/60">
-                {children}
-              </del>
-            );
-          },
-
-          // Tables
-          table({ children }: any) {
-            return (
-              <div className="overflow-x-auto my-4 rounded-lg border border-white/10">
-                <table className="w-full border-collapse">{children}</table>
-              </div>
-            );
-          },
-          thead({ children }: any) {
-            return (
-              <thead className="bg-orange-600/20 border-b border-white/10">
-                {children}
-              </thead>
-            );
-          },
-          tbody({ children }: any) {
-            return <tbody>{children}</tbody>;
-          },
-          tr({ children }: any) {
-            return (
-              <tr className="border-b border-white/10 hover:bg-white/5 transition-colors">
-                {children}
-              </tr>
-            );
-          },
-          th({ children }: any) {
-            return (
-              <th className="px-4 py-2 text-left font-bold text-white/90 text-sm">
-                {children}
-              </th>
-            );
-          },
-          td({ children }: any) {
-            return (
-              <td className="px-4 py-2 text-white/80 text-sm">
-                {children}
-              </td>
-            );
-          },
-
-          // Horizontal rule
-          hr() {
-            return <hr className="my-4 border-t border-white/20" />;
-          },
-
-          // Breaks
-          br() {
-            return <br />;
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+    <div className="space-y-2">
+      {elements}
       {isStreaming && (
         <span className="inline-block w-2 h-5 bg-white/50 ml-1 animate-pulse" />
       )}
-    </>
+    </div>
   );
 }
