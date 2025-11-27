@@ -49,7 +49,7 @@ function CodeBlockWithCopy({
       </div>
       <pre className="p-5 overflow-x-auto">
         <code className="font-mono text-sm leading-relaxed text-white/90 whitespace-pre">
-          {code}
+          {escapeHtml(code)}
         </code>
       </pre>
     </div>
