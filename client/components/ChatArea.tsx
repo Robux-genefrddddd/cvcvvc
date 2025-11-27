@@ -326,7 +326,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
           `assistant:${assistantContent}`,
         );
 
-        toast.success("Image générée avec succès!");
+        toast.success("Image g��nérée avec succès!");
       } else {
         // Get AI response for normal chat
         const conversationHistory = chatMessages.map((msg) => ({
@@ -533,7 +533,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                         </div>
                         <div className="flex-1 max-w-md max-h-96 overflow-y-auto">
                           <div
-                            className="rounded-lg rounded-tr-none py-2 px-3 text-sm break-words transition-all duration-300 flex items-center"
+                            className="rounded-lg rounded-tr-none py-2 px-3 text-sm break-words transition-all duration-300"
                             style={{
                               background: isDark
                                 ? "linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)"
@@ -568,7 +568,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                         </div>
                         <div className="flex-1 max-w-md max-h-96 overflow-y-auto">
                           <div
-                            className="rounded-lg rounded-tl-none py-2 px-3 text-sm break-words transition-all duration-300 flex items-center"
+                            className="rounded-lg rounded-tl-none py-2 px-3 text-sm break-words transition-all duration-300"
                             style={{
                               backgroundColor: isDark ? "#111418" : "#E5E7EB",
                               color: isDark ? "#E5E7EB" : "#1E1E1E",
