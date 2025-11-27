@@ -717,8 +717,9 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
       >
         <div className="flex flex-col items-center w-full">
           <div className="w-full max-w-2xl">
+            {/* Input Container */}
             <div
-              className={`flex items-center gap-3 px-4 transition-all duration-300 group ${
+              className={`transition-all duration-300 group ${
                 !conversationId
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:shadow-lg focus-within:shadow-lg"
@@ -729,150 +730,164 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                   ? "1px solid rgba(255, 255, 255, 0.08)"
                   : "1px solid rgba(0, 0, 0, 0.10)",
                 borderRadius: "16px",
-                height: "56px",
+                padding: "12px 16px",
                 boxShadow: isDark
                   ? "0 2px 12px rgba(0, 0, 0, 0.25)"
                   : "0 1px 6px rgba(0, 0, 0, 0.08)",
                 animation: "messageInputSlideUp 180ms cubic-bezier(0.34, 1.56, 0.64, 1) 0ms both",
               }}
             >
-              {/* Emoji Picker Button */}
-              <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    id="emoji-btn"
-                    className="flex-shrink-0 flex items-center justify-center transition-all duration-120 cursor-pointer"
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "50%",
-                      backgroundColor: isDark
-                        ? "rgba(255, 255, 255, 0.06)"
-                        : "rgba(0, 0, 0, 0.05)",
-                      color: isDark ? "#FFFFFF" : "#000000",
-                      opacity: isDark ? 0.6 : 0.5,
-                      border: "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      const target = e.currentTarget as HTMLButtonElement;
-                      target.style.backgroundColor = isDark
-                        ? "rgba(255, 255, 255, 0.12)"
-                        : "rgba(0, 0, 0, 0.09)";
-                    }}
-                    onMouseLeave={(e) => {
-                      const target = e.currentTarget as HTMLButtonElement;
-                      target.style.backgroundColor = isDark
-                        ? "rgba(255, 255, 255, 0.06)"
-                        : "rgba(0, 0, 0, 0.05)";
-                    }}
-                    aria-label="Ajouter un emoji"
-                  >
-                    <Smile size={20} strokeWidth={1.5} />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className={`w-64 p-3 border rounded-2xl shadow-xl transition-colors duration-300 ${
-                    isDark
-                      ? "bg-card border-white/20"
-                      : "bg-[#FFFFFF] border-black/[0.08]"
-                  }`}
-                >
-                  <div className="grid grid-cols-5 gap-2">
-                    {EMOJIS.map((emoji) => (
-                      <button
-                        key={emoji}
-                        onClick={() => addEmoji(emoji)}
-                        className={`p-2 rounded-lg transition-all duration-200 text-xl hover:scale-125 transform ${
-                          isDark ? "hover:bg-white/10" : "hover:bg-black/[0.05]"
-                        }`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Textarea */}
-              <textarea
-                ref={textareaRef}
-                id="message-input"
-                value={message}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                  handleTextareaAutoResize();
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                disabled={!conversationId || loading}
-                placeholder={
-                  conversationId
-                    ? "Votre message..."
-                    : "Sélectionnez une conversation..."
-                }
-                className="flex-1 bg-transparent focus:outline-none disabled:opacity-50 transition-colors resize-none"
+              {/* Inner Flex Container - Controls alignment and spacing */}
+              <div
+                className="flex items-center gap-3 w-full"
                 style={{
-                  fontSize: "15.5px",
-                  lineHeight: "1.45",
-                  color: isDark ? "#FFFFFF" : "#1A1A1A",
-                  backgroundColor: "transparent",
-                  border: "none",
-                  outline: "none",
-                  fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-                  padding: "0",
-                  margin: "0",
-                  height: `${AUTO_RESIZE_CONFIG.minHeight}px`,
-                  overflow: "hidden",
-                  maxHeight: "calc(15.5px * 1.45 * 5)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
                 }}
-              />
-
-              {/* Send Button */}
-              <button
-                onClick={handleSend}
-                disabled={loading || !message.trim()}
-                className="flex-shrink-0 flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-90"
-                style={{
-                  width: "34px",
-                  height: "34px",
-                  borderRadius: "50%",
-                  border: "none",
-                  backgroundColor: message.trim()
-                    ? isDark
-                      ? "rgba(59, 130, 246, 0.1)"
-                      : "rgba(59, 130, 246, 0.08)"
-                    : "transparent",
-                  color: message.trim() ? "#3b82f6" : isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.2)",
-                  cursor: message.trim() ? "pointer" : "default",
-                }}
-                onMouseEnter={(e) => {
-                  const target = e.currentTarget as HTMLButtonElement;
-                  if (message.trim()) {
-                    target.style.backgroundColor = isDark
-                      ? "rgba(59, 130, 246, 0.15)"
-                      : "rgba(59, 130, 246, 0.12)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.currentTarget as HTMLButtonElement;
-                  if (message.trim()) {
-                    target.style.backgroundColor = isDark
-                      ? "rgba(59, 130, 246, 0.1)"
-                      : "rgba(59, 130, 246, 0.08)";
-                  }
-                }}
-                aria-label="Envoyer le message"
               >
-                {loading ? (
-                  <Loader2 size={18} className="animate-spin" strokeWidth={2} />
-                ) : (
-                  <Send size={18} strokeWidth={2} />
-                )}
-              </button>
+                {/* Emoji Picker Button */}
+                <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      id="emoji-btn"
+                      className="flex-shrink-0 flex items-center justify-center transition-all duration-120 cursor-pointer"
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "50%",
+                        backgroundColor: isDark
+                          ? "rgba(255, 255, 255, 0.06)"
+                          : "rgba(0, 0, 0, 0.05)",
+                        color: isDark ? "#FFFFFF" : "#000000",
+                        opacity: isDark ? 0.6 : 0.5,
+                        border: "none",
+                        flexShrink: 0,
+                      }}
+                      onMouseEnter={(e) => {
+                        const target = e.currentTarget as HTMLButtonElement;
+                        target.style.backgroundColor = isDark
+                          ? "rgba(255, 255, 255, 0.12)"
+                          : "rgba(0, 0, 0, 0.09)";
+                      }}
+                      onMouseLeave={(e) => {
+                        const target = e.currentTarget as HTMLButtonElement;
+                        target.style.backgroundColor = isDark
+                          ? "rgba(255, 255, 255, 0.06)"
+                          : "rgba(0, 0, 0, 0.05)";
+                      }}
+                      aria-label="Ajouter un emoji"
+                    >
+                      <Smile size={20} strokeWidth={1.5} />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className={`w-64 p-3 border rounded-2xl shadow-xl transition-colors duration-300 ${
+                      isDark
+                        ? "bg-card border-white/20"
+                        : "bg-[#FFFFFF] border-black/[0.08]"
+                    }`}
+                  >
+                    <div className="grid grid-cols-5 gap-2">
+                      {EMOJIS.map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => addEmoji(emoji)}
+                          className={`p-2 rounded-lg transition-all duration-200 text-xl hover:scale-125 transform ${
+                            isDark ? "hover:bg-white/10" : "hover:bg-black/[0.05]"
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Textarea - Grows to fill available space */}
+                <textarea
+                  ref={textareaRef}
+                  id="message-input"
+                  value={message}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    handleTextareaAutoResize();
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  disabled={!conversationId || loading}
+                  placeholder={
+                    conversationId
+                      ? "Votre message..."
+                      : "Sélectionnez une conversation..."
+                  }
+                  className="flex-grow bg-transparent focus:outline-none disabled:opacity-50 transition-colors resize-none"
+                  style={{
+                    fontSize: "15.5px",
+                    lineHeight: "1.4",
+                    color: isDark ? "#FFFFFF" : "#1A1A1A",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    outline: "none",
+                    fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                    padding: "0",
+                    margin: "0",
+                    height: "auto",
+                    minHeight: "24px",
+                    overflow: "hidden",
+                    maxHeight: "calc(15.5px * 1.4 * 5)",
+                    resize: "none",
+                  }}
+                />
+
+                {/* Send Button - Fixed width, right aligned */}
+                <button
+                  onClick={handleSend}
+                  disabled={loading || !message.trim()}
+                  className="flex-shrink-0 flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-90"
+                  style={{
+                    width: "34px",
+                    height: "34px",
+                    borderRadius: "50%",
+                    border: "none",
+                    backgroundColor: message.trim()
+                      ? isDark
+                        ? "rgba(59, 130, 246, 0.1)"
+                        : "rgba(59, 130, 246, 0.08)"
+                      : "transparent",
+                    color: message.trim() ? "#3b82f6" : isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.2)",
+                    cursor: message.trim() ? "pointer" : "default",
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.currentTarget as HTMLButtonElement;
+                    if (message.trim()) {
+                      target.style.backgroundColor = isDark
+                        ? "rgba(59, 130, 246, 0.15)"
+                        : "rgba(59, 130, 246, 0.12)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.currentTarget as HTMLButtonElement;
+                    if (message.trim()) {
+                      target.style.backgroundColor = isDark
+                        ? "rgba(59, 130, 246, 0.1)"
+                        : "rgba(59, 130, 246, 0.08)";
+                    }
+                  }}
+                  aria-label="Envoyer le message"
+                >
+                  {loading ? (
+                    <Loader2 size={18} className="animate-spin" strokeWidth={2} />
+                  ) : (
+                    <Send size={18} strokeWidth={2} />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Image Generation Loading State */}
