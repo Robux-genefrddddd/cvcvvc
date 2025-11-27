@@ -218,7 +218,7 @@ export function Sidebar({
         } z-50 animate-slideInLeft`}
       >
         {/* Header - Minimal */}
-        <div className="p-3 sm:p-3 animate-fadeIn border-b border-white/[0.08]">
+        <div className="pt-5 px-3 pb-3 animate-fadeIn border-b border-white/[0.08]">
           <div className="flex items-center gap-2.5 justify-between mb-2.5">
             <button
               onClick={() => setIsSettingsOpen(true)}
@@ -297,13 +297,13 @@ export function Sidebar({
 
         {/* New Conversation Button */}
         <div
-          className="px-3 py-3 animate-fadeIn"
+          className="px-3 py-4 animate-fadeIn"
           style={{ animationDelay: "0.1s" }}
         >
           <button
             id="new-conversation-btn"
             onClick={handleNewConversation}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary/20 hover:bg-primary/30 text-primary font-medium text-xs rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary font-medium text-xs rounded-lg transition-all duration-200 shadow-sm hover:shadow-md hover:opacity-95 hover:-translate-y-px active:scale-95"
           >
             <Plus size={16} className="flex-shrink-0" />
             <span>New</span>
@@ -311,8 +311,8 @@ export function Sidebar({
         </div>
 
         {/* Conversations List */}
-        <div id="conversations-list" className="flex-1 overflow-y-auto p-3">
-          <div className="space-y-1.5">
+        <div id="conversations-list" className="flex-1 overflow-y-auto px-3 py-2">
+          <div className="space-y-2">
             {conversations.map((conv, idx) => (
               <div
                 key={conv.id}
@@ -326,15 +326,15 @@ export function Sidebar({
                 }}
               >
                 <div
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all border shadow-sm group-hover:-translate-y-0.5 ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all border shadow-sm group-hover:-translate-y-px ${
                     conv.id === activeConversationId
                       ? "bg-primary/15 border-primary/50 text-foreground shadow-md"
-                      : "border-white/[0.08] hover:bg-white/[0.05] text-muted-foreground hover:text-foreground hover:shadow-md"
+                      : "border-white/[0.08] hover:bg-white/[0.05] text-muted-foreground hover:text-foreground hover:shadow-md hover:border-primary/30"
                   }`}
                 >
                   <button
                     onClick={() => onConversationSelect?.(conv.id)}
-                    className={`flex-1 text-left text-sm transition-all py-1 px-2 rounded-lg ${
+                    className={`flex-1 text-left text-xs transition-all py-1 px-1 rounded-lg truncate ${
                       conv.id === activeConversationId
                         ? "text-foreground font-medium"
                         : "text-foreground/70 hover:text-foreground"
@@ -367,7 +367,7 @@ export function Sidebar({
         {/* Message Usage Section */}
         <div
           id="messages-counter"
-          className="px-3 py-4 border-t border-white/[0.08] animate-fadeIn mx-3 bg-white/[0.02] rounded-xl"
+          className="px-3 py-3 border-t border-white/[0.08] animate-fadeIn mx-3 bg-white/[0.02] rounded-lg"
           style={{ animationDelay: "0.25s" }}
         >
           <div className="flex items-center gap-2 mb-2.5 justify-between">
@@ -412,12 +412,12 @@ export function Sidebar({
 
         {/* Footer - Sign Out */}
         <div
-          className="px-3 py-3 border-t border-white/[0.08] animate-fadeIn"
+          className="px-3 py-4 border-t border-white/[0.08] animate-fadeIn"
           style={{ animationDelay: "0.3s" }}
         >
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-400/80 hover:text-red-400 border border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10 transition-all text-xs font-medium rounded-xl hover:-translate-y-0.5 active:scale-95 shadow-sm hover:shadow-md"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-red-400/80 hover:text-red-400 border border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10 transition-all text-xs font-medium rounded-lg hover:opacity-95 hover:-translate-y-px active:scale-95 shadow-sm hover:shadow-md"
           >
             <LogOut size={16} />
             <span>Se déconnecter</span>
