@@ -126,10 +126,22 @@ export function SettingsModal({ isOpen, onOpenChange }: SettingsModalProps) {
                 className="animate-fadeIn"
                 style={{ animationDelay: "0.05s" }}
               >
-                <h3 className="text-xs font-semibold text-foreground/80 uppercase tracking-wider mb-3">
+                <h3
+                  className={`text-xs font-semibold uppercase tracking-wider mb-3 transition-colors duration-300 ${
+                    isDark
+                      ? "text-foreground/80"
+                      : "text-[#3F3F3F]/70"
+                  }`}
+                >
                   Photo de profil
                 </h3>
-                <div className="bg-white/[0.03] rounded-[10px] p-4 shadow-sm">
+                <div
+                  className={`rounded-[10px] p-4 shadow-sm transition-all duration-300 ${
+                    isDark
+                      ? "bg-white/[0.03]"
+                      : "bg-[#FFFFFF] border border-black/[0.08]"
+                  }`}
+                >
                   <ProfilePhotoUpload
                     userId={user.uid}
                     currentPhotoUrl={
