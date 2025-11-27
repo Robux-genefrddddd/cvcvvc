@@ -427,6 +427,8 @@ export function MessageRenderer({
   role,
   isStreaming = false,
 }: MessageRendererProps) {
+  const { isDark } = useTheme();
+
   // Check if content is an image URL
   const imageUrlPattern = /^https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)$/i;
   const isImageUrl = imageUrlPattern.test(content.trim());
@@ -434,7 +436,13 @@ export function MessageRenderer({
   if (isImageUrl) {
     return (
       <div className="flex justify-center">
-        <div className="rounded-3xl overflow-hidden border-2 border-white/20 shadow-lg max-w-xs">
+        <div
+          className={`rounded-3xl overflow-hidden border-2 shadow-lg max-w-xs transition-all duration-300 ${
+            isDark
+              ? "border-white/20"
+              : "border-black/[0.08]"
+          }`}
+        >
           <img
             src={content}
             alt="Message content"
@@ -445,13 +453,17 @@ export function MessageRenderer({
     );
   }
 
-  const elements = parseMarkdownElements(content);
+  const elements = parseMarkdownElements(content, isDark);
 
   return (
     <div>
       {elements}
       {isStreaming && (
-        <span className="inline-block w-2 h-5 bg-white/50 ml-1 animate-pulse" />
+        <span
+          className={`inline-block w-2 h-5 ml-1 animate-pulse transition-colors duration-300 ${
+            isDark ? "bg-white/50" : "bg-[#3F3F3F]/50"
+          }`}
+        />
       )}
     </div>
   );
