@@ -5,6 +5,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { MessagesService, Message } from "@/lib/messages";
 import { getStorage, ref, getBytes } from "firebase/storage";
 import { AIService } from "@/lib/ai";
+import { splitIntoBlocks, getBlockPauseDuration } from "@/lib/blockSplitter";
 import {
   validateMessageContent,
   detectInjectionAttempt,
