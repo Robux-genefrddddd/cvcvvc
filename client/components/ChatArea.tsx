@@ -533,12 +533,14 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                         </div>
                         <div className="flex-1 max-w-md max-h-96 overflow-y-auto">
                           <div
-                            className="rounded-2xl rounded-tr-none px-4 py-3 text-sm leading-[1.55] break-words transition-all duration-300"
+                            className="rounded-lg rounded-tr-none py-2 px-3 text-sm break-words transition-all duration-300 flex items-center"
                             style={{
                               background: isDark
                                 ? "linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)"
                                 : "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
                               color: "#FFFFFF",
+                              height: "auto",
+                              lineHeight: "1.3",
                               boxShadow: isDark
                                 ? "0 4px 16px rgba(0, 0, 0, 0.3)"
                                 : "0 2px 8px rgba(37, 99, 235, 0.2)",
@@ -566,10 +568,12 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                         </div>
                         <div className="flex-1 max-w-md max-h-96 overflow-y-auto">
                           <div
-                            className="rounded-2xl rounded-tl-none px-4 py-3 text-sm leading-[1.55] break-words transition-all duration-300"
+                            className="rounded-lg rounded-tl-none py-2 px-3 text-sm break-words transition-all duration-300 flex items-center"
                             style={{
                               backgroundColor: isDark ? "#111418" : "#E5E7EB",
                               color: isDark ? "#E5E7EB" : "#1E1E1E",
+                              height: "auto",
+                              lineHeight: "1.3",
                               border: isDark
                                 ? "1px solid rgba(255, 255, 255, 0.08)"
                                 : "1px solid rgba(0, 0, 0, 0.06)",
